@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 async function getMessages(channel) {
     const messages = [];
@@ -81,5 +81,20 @@ module.exports = {
 
         console.log(userActivity);
         await interaction.editReply('DONE.');
+
+        // create embed to display leaderboard
+        const leaderboardEmbed = new EmbedBuilder()
+            .setColor(0x0099FF)
+            .setTitle('Most Active Users')
+            .setTimestamp();
+        
+        let place = 1;
+        const sortedUserActivity = Array.from(userActivity.entries()).sort(([, a], [, b]) => b - a);
+        for ([user, numOfMessages] of sortedUserActivity) {
+            leaderboardEmbed.addFields({ name: '\u200B', value: `${place}: <@${user}> (${numOfMessages} messages)`, inline: false });
+            place++;
+        }
+            
+        interaction.channel.send({ embeds: [leaderboardEmbed] });
 	},
 };
